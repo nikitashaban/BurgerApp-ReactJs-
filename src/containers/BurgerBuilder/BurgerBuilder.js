@@ -10,7 +10,7 @@ import withErrorHandler from "../../hoc/withErrorHandler/withErrorHandler";
 import { connect } from "react-redux";
 import * as actions from "../../store/actions/index";
 
-class BurgerBuilder extends Component {
+export class BurgerBuilder extends Component {
   // constructor(props){
   //   super(props)
   //   this.state: {
@@ -38,7 +38,12 @@ class BurgerBuilder extends Component {
   }
 
   perchaseHandler = () => {
-    this.setState({ perchasing: true });
+    if (this.props.isAuthenticated) {
+      this.setState({ perchasing: true });
+    } else {
+      this.props.onSetAuthRedirectPath("/checkout");
+      this.props.history.push("/auth");
+    }
   };
   perchaseCancelHandler = () => {
     this.setState({ perchasing: false });
@@ -71,6 +76,7 @@ class BurgerBuilder extends Component {
             price={this.props.price}
             perchasable={this.updatePerchaseState(this.props.ing)}
             ordered={this.perchaseHandler}
+            isAuth={this.props.isAuthenticated}
           />
         </Aux>
       );
@@ -99,7 +105,8 @@ const mapStateToProps = state => {
   return {
     ing: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.price,
-    error: state.burgerBuilder.error
+    error: state.burgerBuilder.error,
+    isAuthenticated: state.auth.token !== null
   };
 };
 
@@ -108,7 +115,8 @@ const mapDispatchToProps = dispatch => {
     onAddIngredients: ingName => dispatch(actions.addIngredient(ingName)),
     onRemoveIngredients: ingName => dispatch(actions.removeIngredient(ingName)),
     onInitIgredients: () => dispatch(actions.initIngredients()),
-    onInitPerchase: () => dispatch(actions.perchaseInit())
+    onInitPerchase: () => dispatch(actions.perchaseInit()),
+    onSetAuthRedirectPath: path => dispatch(actions.setRedirectPath(path))
   };
 };
 

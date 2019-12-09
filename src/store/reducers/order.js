@@ -1,5 +1,5 @@
 import * as actionTypes from "../actions/actionTypes";
-import { updateObject } from "../utiity";
+import { updateObject } from "../utility";
 
 const initialState = {
   orders: [],
@@ -31,7 +31,7 @@ const fetchOrderStart = (state, action) => {
   return updateObject(state, { loading: true });
 };
 const fetchOrderSuccess = (state, action) => {
-  return updateObject(state, { order: action.order, loading: false });
+  return updateObject(state, { orders: action.order, loading: false });
 };
 const fetchOrderFail = (state, action) => {
   return updateObject(state, { loading: false });

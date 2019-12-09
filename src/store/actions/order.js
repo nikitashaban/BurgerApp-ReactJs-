@@ -26,14 +26,14 @@ export const perchaseInit = () => {
   };
 };
 
-export const perchaseBurger = orderData => {
+export const perchaseBurger = (orderData, token) => {
   return dispatch => {
     dispatch(perchaseBurgerStart());
     axios
-      .post("/orders.json", orderData)
-      .then(respsone => {
-        console.log(respsone.data);
-        dispatch(perchaseBurgerSuccess(respsone.name, orderData));
+      .post("/orders.json?auth=" + token, orderData)
+      .then(response => {
+        console.log(response.data);
+        dispatch(perchaseBurgerSuccess(response.name, orderData));
       })
       .catch(error => {
         dispatch(perchaseBurgerFail(error));
@@ -61,11 +61,12 @@ export const fetchOrderStart = () => {
   };
 };
 
-export const fetchOrders = () => {
+export const fetchOrders = (token, userId) => {
   return dispatch => {
     dispatch(fetchOrderStart());
+    const queryParams = "?auth=" + token + '&orderBy="userId"&equalTo="' + userId + '"';
     axios
-      .get("https://burgerbuilder-8cf79.firebaseio.com/orders.json")
+      .get("https://burgerbuilder-8cf79.firebaseio.com/orders.json" + queryParams)
       .then(res => {
         const fetchedData = [];
         for (let key in res.data) {
@@ -74,7 +75,7 @@ export const fetchOrders = () => {
             id: key
           });
         }
-        debugger;
+
         dispatch(fetchOrderSuccess(fetchedData));
       })
       .catch(err => {

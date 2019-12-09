@@ -7,6 +7,7 @@ import Spinner from "../../../components/UI/Spinner/Spinner";
 import Input from "../../../components/UI/Input/Input";
 import withErrorHandle from "../../../hoc/withErrorHandler/withErrorHandler";
 import * as actions from "../../../store/actions/index";
+import { checkValidity } from "../../../store/utility";
 
 class ContactData extends Component {
   state = {
@@ -101,32 +102,14 @@ class ContactData extends Component {
     for (let formElementIdentofier in this.state.orderForm) {
       formData[formElementIdentofier] = this.state.orderForm[formElementIdentofier].value;
     }
-    console.log(this.props.ingredients);
 
     const order = {
       ingredients: this.props.ing,
       price: this.props.price,
-      orderData: formData
+      orderData: formData,
+      userId: this.props.userId
     };
-    this.props.onBurgerStart(order);
-  };
-
-  checkValidity = (value, rules) => {
-    let isValid = true;
-    if (!rules) {
-      return true;
-    }
-
-    if (rules.required) {
-      isValid = value.trim() !== "" && isValid;
-    }
-    if (rules.minLength) {
-      isValid = value.length >= rules.minLength && isValid;
-    }
-    if (rules.maxLength) {
-      isValid = value.length <= rules.maxLength && isValid;
-    }
-    return isValid;
+    this.props.onBurgerStart(order, this.props.token);
   };
 
   inputChangedHandler = (event, inputIdentifier) => {
@@ -137,7 +120,7 @@ class ContactData extends Component {
       ...updatedOrderForm[inputIdentifier]
     };
     updatedFormElement.value = event.target.value;
-    updatedFormElement.valid = this.checkValidity(
+    updatedFormElement.valid = checkValidity(
       updatedFormElement.value,
       updatedFormElement.validation
     );
@@ -148,7 +131,7 @@ class ContactData extends Component {
     for (let inputIdentifier in updatedOrderForm) {
       formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid;
     }
-    console.log(formIsValid);
+
     this.setState({ orderForm: updatedOrderForm, formIsValid: formIsValid });
   };
   render() {
@@ -193,12 +176,14 @@ const mapStateToProps = state => {
   return {
     ing: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.price,
-    loading: state.order.loading
+    loading: state.order.loading,
+    token: state.auth.token,
+    userId: state.auth.userId
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
-    onBurgerStart: orderData => dispatch(actions.perchaseBurger(orderData))
+    onBurgerStart: (orderData, token) => dispatch(actions.perchaseBurger(orderData, token))
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandle(ContactData, axios));

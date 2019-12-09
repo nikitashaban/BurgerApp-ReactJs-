@@ -4,9 +4,7 @@ import Button from "../../UI/Button/Button";
 
 class OrderSummary extends Component {
   // class component for debugging lifecycle
-  componentDidUpdate() {
-    console.log("[OrderSummary] WillUpdate");
-  }
+  componentDidUpdate() {}
   render() {
     const ingredientSummary = Object.keys(this.props.ingredients).map(igKey => {
       return (
